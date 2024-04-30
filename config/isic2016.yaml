@@ -1,0 +1,23 @@
+arch: xboundformer
+gpu: '0'
+net_layer: 50
+dataset: isic2016
+exp_name: test
+fold: null
+lr_seg: 0.0001
+n_epochs: 150
+bt_size: 12
+seg_loss: 1
+aug: 1
+patience: 500
+filter: 0
+im_num: 1
+ex_num: 1
+xbound: 1
+point_w: 1.0
+folder_name: Default_folder
+
+image_size: 256
+
+dataset_path: ./data/isic2016/
+gt_format: '{}_Segmentation.png'

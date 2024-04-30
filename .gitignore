@@ -5,3 +5,4 @@ exps/
 scripts/
 *.pyc
 figures/
+.idea
