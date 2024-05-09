@@ -5,12 +5,12 @@ from os.path import join
 
 import numpy as np
 import yaml
+from torch.utils.data import DataLoader
 from tqdm import tqdm
 
-from lib.metrics import get_binary_metrics, MetricsResult
-from utils.name_config import NameConfig
-
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
+from src.base import get_cfg
+from lib.metrics import get_binary_metrics, MetricsResult
 import torch.nn.functional as F
 import torch.utils.data
 
@@ -22,47 +22,7 @@ from torch.optim.lr_scheduler import CosineAnnealingLR
 import time
 
 
-def get_cfg():
-    parser = argparse.ArgumentParser()
-    parser.add_argument('--config', type=str, default='./config/isic2016.yaml')
-    parser.add_argument('--dataset_path', type=str)
-    parser.add_argument('--arch', type=str)
-    parser.add_argument('--gpu', type=str)
-    parser.add_argument('--net_layer', type=int)
-    parser.add_argument('--dataset', type=str)
-    parser.add_argument('--exp_name', type=str)
-    parser.add_argument('--fold', type=str)
-    parser.add_argument('--lr_seg', type=float)  # 0.0003
-    parser.add_argument('--n_epochs', type=int)  # 100
-    parser.add_argument('--bt_size', type=int)  # 36
-    parser.add_argument('--seg_loss', type=int)
-    parser.add_argument('--aug', type=int)
-    parser.add_argument('--patience', type=int)  # 50
 
-    # transformer
-    parser.add_argument('--filter', type=int)
-    parser.add_argument('--im_num', type=int)
-    parser.add_argument('--ex_num', type=int)
-    parser.add_argument('--xbound', type=int)
-    parser.add_argument('--point_w', type=float)
-
-    # log_dir name
-    parser.add_argument('--folder_name', type=str)
-
-    parse_config = parser.parse_args()
-    with open(parse_config.config, "r") as yaml_file:
-        # 使用PyYAML加载YAML数据
-        config = yaml.safe_load(yaml_file)
-
-    def merge_dicts(dict1, dict2):
-        for key, value in dict2.items():
-            if value is not None:
-                dict1[key] = value
-        return dict1
-
-    args_dict = vars(parse_config)
-    config = merge_dicts(config, args_dict)
-    return NameConfig(**config)
 
 
 def ce_loss(pred, gt):
@@ -255,7 +215,7 @@ if __name__ == '__main__':
         pin_memory=True,
         drop_last=True
     )
-    val_loader = torch.utils.data.DataLoader(
+    val_loader = DataLoader(
         dataset2,
         batch_size=1,  # parse_config.bt_size
         shuffle=False,  # True
@@ -274,7 +234,8 @@ if __name__ == '__main__':
         from lib.TransFuse.TransFuse import TransFuse_S
 
         model = TransFuse_S(pretrained=True).cuda()
-
+    else:
+        exit(1)
     if len(device_ids) > 1:  # 多卡训练
         model = torch.nn.DataParallel(model).cuda()
 

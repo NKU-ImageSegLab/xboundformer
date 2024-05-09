@@ -130,30 +130,9 @@ class ISICDataset(data.Dataset):
             'image': image_data,
             'label': label_data,
             'point': point_data,
-            'filter_point_data': filter_point_data
+            'filter_point_data': filter_point_data,
+            'origin_image_name': origin_image_name
         }
 
     def __len__(self):
         return self.num_samples
-
-
-if __name__ == '__main__':
-    dataset = myDataset(split='train', aug=True)
-
-    train_loader = torch.utils.data.DataLoader(dataset,
-                                               batch_size=8,
-                                               shuffle=False,
-                                               num_workers=2,
-                                               pin_memory=True,
-                                               drop_last=True)
-    import matplotlib.pyplot as plt
-
-    for d in dataset:
-        print(d['image'].shape, d['image'].max())
-        print(d['point'].shape, d['point'].max())
-        print(d['filter_point_data'].shape, d['filter_point_data'].max())
-        image = d['image'].permute(1, 2, 0).cpu()
-        point = d['point'][0].cpu()
-        filter_point_data = d['filter_point_data'][0].cpu()
-        plt.imshow(filter_point_data)
-        plt.show()

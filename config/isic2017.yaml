@@ -20,4 +20,4 @@ folder_name: Default_folder
 image_size: 256
 
 dataset_path: ./data/isic2017/
-gt_format: '{}_Segmentation.png'
+gt_format: '{}_segmentation.png'
