@@ -18,9 +18,18 @@ from src.base import get_cfg
 
 def test(model, loader, config):
     exp_name = config.dataset
-    base_path = join('logs', exp_name)
+
+    base_path = join('logs', exp_name).__str__()
+    if parse_config.trained_model_path is not None:
+        base_path = join(parse_config.trained_model_path, exp_name).__str__()
+
+    result_path = base_path
+
+    if parse_config.result_path is not None:
+        result_path = join(parse_config.result_path, exp_name).__str__()
+
     model_path = join(base_path, 'model')
-    image_path = join(base_path, 'image')
+    image_path = join(result_path, 'image')
     os.makedirs(base_path, exist_ok=True)
     os.makedirs(model_path, exist_ok=True)
     os.makedirs(image_path, exist_ok=True)

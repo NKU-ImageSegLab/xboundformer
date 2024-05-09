@@ -180,11 +180,19 @@ if __name__ == '__main__':
 
     # -------------------------- build loggers and savers --------------------------#
     exp_name = parse_config.dataset
+
     base_path = join('logs', exp_name)
-    model_path = join(base_path, 'model')
+    log_path = join('logs', exp_name)
+
+    if parse_config.trained_model_path is not None:
+        base_path = join(parse_config.trained_model_path, exp_name)
+    if parse_config.log_file_path is not None:
+        log_path = join(parse_config.log_file_path, exp_name)
+
+    model_path = join(base_path.__str__(), 'model')
     os.makedirs(base_path, exist_ok=True)
     os.makedirs(model_path, exist_ok=True)
-    writer = SummaryWriter('logs/{}/log'.format(exp_name))
+    writer = SummaryWriter(log_path.__str__())
     best_path = join(model_path, 'best.pkl')
     latest_path = join(model_path, 'latest.pkl')
 
