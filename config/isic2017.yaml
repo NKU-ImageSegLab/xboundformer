@@ -19,6 +19,7 @@ folder_name: Default_folder
 
 image_size: 256
 
+pretrained_model_path: pvt_v2_b2.pth
 log_file_path: ./logs/
 trained_model_path: ./trained_models/
 dataset_path: ./data/isic2017/

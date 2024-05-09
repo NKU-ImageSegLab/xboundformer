@@ -9,12 +9,11 @@ from lib.vision_transformers import in_scale_transformer
 from lib.pvtv2 import pvt_v2_b2  #
 
 
-def _segm_pvtv2(num_classes, im_num, ex_num, xbound, trainsize):
+def _segm_pvtv2(num_classes, im_num, ex_num, xbound, trainsize, pretrained_model_path=None):
     backbone = pvt_v2_b2(img_size=trainsize)
 
-    if 1:
-        path = 'pvt_v2_b2.pth'
-        save_model = torch.load(path)
+    if pretrained_model_path is not None:
+        save_model = torch.load(pretrained_model_path)
         model_dict = backbone.state_dict()
         state_dict = {
             k: v

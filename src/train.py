@@ -22,9 +22,6 @@ from torch.optim.lr_scheduler import CosineAnnealingLR
 import time
 
 
-
-
-
 def ce_loss(pred, gt):
     pred = torch.clamp(pred, 1e-6, 1 - 1e-6)
     return (-gt * torch.log(pred) - (1 - gt) * torch.log(1 - pred)).mean()
@@ -237,7 +234,8 @@ if __name__ == '__main__':
         from lib.xboundformer import _segm_pvtv2
 
         model = _segm_pvtv2(1, parse_config.im_num, parse_config.ex_num,
-                            parse_config.xbound, parse_config.image_size).cuda()
+                            parse_config.xbound, parse_config.image_size,
+                            pretrained_model_path=parse_config.pretrained_model_path).cuda()
     elif parse_config.arch == 'transfuse':
         from lib.TransFuse.TransFuse import TransFuse_S
 
