@@ -13,7 +13,7 @@ from tqdm import tqdm
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 from lib.metrics import get_binary_metrics, MetricsResult
-from src.base import get_cfg
+from base import get_cfg
 
 
 def test(model, loader, config):
@@ -83,7 +83,7 @@ if __name__ == '__main__':
 
     # -------------------------- build dataloaders --------------------------#
     if 'isic' in parse_config.dataset:
-        from utils.isic_dataset import ISICDataset
+        from public.isic_dataset import ISICDataset
 
         dataset = ISICDataset(
             parse_config,

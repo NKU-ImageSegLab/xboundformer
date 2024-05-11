@@ -1,15 +1,13 @@
-import argparse
 import os
 import sys
 from os.path import join
 
 import numpy as np
-import yaml
 from torch.utils.data import DataLoader
 from tqdm import tqdm
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
-from src.base import get_cfg
+from base import get_cfg
 from lib.metrics import get_binary_metrics, MetricsResult
 import torch.nn.functional as F
 import torch.utils.data
@@ -45,7 +43,8 @@ def structure_loss(pred, mask):
 # -------------------------- train func --------------------------#
 def train(epoch, train_loader, config):
     model.train()
-    metrics = get_binary_metrics()
+    if config.print_metrics:
+        metrics = get_binary_metrics()
     losses = []
     for batch_idx, batch_data in tqdm(
             iterable=enumerate(train_loader),
@@ -81,7 +80,8 @@ def train(epoch, train_loader, config):
                             loss3.item(), loss4.item()))
         else:
             P2, point_maps_pre, point_maps_pre1, point_maps_pre2 = model(data)
-            metrics.update(P2[0], label.int())
+            if config.print_metrics:
+                metrics.update(P2[0], label.int())
             if parse_config.im_num + parse_config.ex_num > 0:
                 point_loss = 0.0
                 point3 = F.max_pool2d(point, (32, 32), (32, 32))
@@ -111,9 +111,9 @@ def train(epoch, train_loader, config):
             optimizer.zero_grad()
             loss.backward()
             optimizer.step()
-
-    result = MetricsResult(metrics.compute())
-    print(result.to_log('Train', epoch - 1, config.n_epochs + 1, np.mean(losses)))
+    if config.print_metrics:
+        result = MetricsResult(metrics.compute())
+        print(result.to_log('Train', epoch - 1, config.n_epochs + 1, np.mean(losses)))
 
 
 # -------------------------- eval func --------------------------#
@@ -124,7 +124,8 @@ def evaluation(epoch, loader, config):
     dice_average = 0
     iou_average = 0
     numm = 0
-    metrics = get_binary_metrics()
+    if config.print_metrics:
+        metrics = get_binary_metrics()
     for batch_idx, batch_data in tqdm(
             iterable=enumerate(loader),
             desc=f"{config.dataset} Val [{epoch}/{config.n_epochs}]",
@@ -146,7 +147,8 @@ def evaluation(epoch, loader, config):
                 output, point_maps_pre, point_maps_pre1, point_maps_pre2 = model(
                     data)
                 loss = 0
-                metrics.update(output, label.int())
+                if config.print_metrics:
+                    metrics = get_binary_metrics()
             if parse_config.arch == 'transfuse':
                 loss = loss_fuse
 
@@ -166,8 +168,12 @@ def evaluation(epoch, loader, config):
     # writer.add_scalar('val_metrics/val_iou', iou_average, epoch)
     # print("Average dice value of evaluation dataset = ", dice_average)
     # print("Average iou value of evaluation dataset = ", iou_average)
-    result = MetricsResult(metrics.compute())
-    print(result.to_log('Val', epoch, config.n_epochs + 1, loss))
+    if config.print_metrics:
+        result = MetricsResult(metrics.compute())
+        print(result.to_log('Val', epoch, config.n_epochs + 1, loss))
+    else:
+        print("Average dice value of evaluation dataset = ", dice_average)
+        print("Average iou value of evaluation dataset = ", iou_average)
     return dice_average, iou_average, loss
 
 
@@ -199,7 +205,7 @@ if __name__ == '__main__':
 
     # -------------------------- build dataloaders --------------------------#
     if 'isic' in parse_config.dataset:
-        from utils.isic_dataset import ISICDataset
+        from public.isic_dataset import ISICDataset
 
         dataset = ISICDataset(
             parse_config,

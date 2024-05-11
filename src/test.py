@@ -33,7 +33,7 @@ def isbi2016():
         for fold in ['PH2', 'Test']:
             save_dir = f'results/ISIC-2016-pictures/{model_name}/{fold}'
             os.makedirs(save_dir, exist_ok=True)
-            from utils.isbi2016_new import norm01, myDataset
+            from public.isbi2016_new import norm01, myDataset
             if fold == 'PH2':
                 dataset = myDataset(split='test', aug=False)
             else:
@@ -74,7 +74,7 @@ def isbi2018():
             ))
         save_dir = f'results/ISIC-2018-pictures/xboundformer/fold-{int(fold)+1}'
         os.makedirs(save_dir, exist_ok=True)
-        from utils.isbi2018_new import norm01, myDataset
+        from public.isbi2018_new import norm01, myDataset
         dataset = myDataset(fold=str(fold), split='valid', aug=False)
         test_loader = torch.utils.data.DataLoader(dataset, batch_size=1)
 
@@ -105,7 +105,7 @@ def isbi2018_ablation(folder_name):
             ))
         save_dir = f'results/ISIC-2018-pictures/{folder_name}/fold-{int(fold)+1}'
         os.makedirs(save_dir, exist_ok=True)
-        from utils.isbi2018_new import norm01, myDataset
+        from public.isbi2018_new import norm01, myDataset
         dataset = myDataset(fold=str(fold), split='valid', aug=False)
         test_loader = torch.utils.data.DataLoader(dataset, batch_size=1)
 
