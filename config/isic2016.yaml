@@ -19,9 +19,9 @@ folder_name: Default_folder
 
 image_size: 256
 
-pretrained_model_path: pvt_v2_b2.pth
-log_file_path: ./logs/
-trained_model_path: ./trained_models/
-dataset_path: ./data/isic2016/
-result_path: ./results/
+pretrained_model_path: /gemini/pretrain/pvt_v2_b2.pth
+log_file_path: /gemini/logs/
+trained_model_path: /gemini/output/
+dataset_path: /gemini/data-1/data_isic161718/isic2016/
+result_path: /gemini/output/
 gt_format: '{}_Segmentation.png'
