@@ -41,10 +41,10 @@ def structure_loss(pred, mask):
 
 
 # -------------------------- train func --------------------------#
-def train(epoch, train_loader, config):
+def train(epoch, train_loader, config, metrics):
     model.train()
     if config.print_metrics:
-        metrics = get_binary_metrics()
+        metrics.reset()
     losses = []
     for batch_idx, batch_data in tqdm(
             iterable=enumerate(train_loader),
@@ -117,7 +117,7 @@ def train(epoch, train_loader, config):
 
 
 # -------------------------- eval func --------------------------#
-def evaluation(epoch, loader, config):
+def evaluation(epoch, loader, config, metrics):
     model.eval()
     dice_value = 0
     iou_value = 0
@@ -125,7 +125,7 @@ def evaluation(epoch, loader, config):
     iou_average = 0
     numm = 0
     if config.print_metrics:
-        metrics = get_binary_metrics()
+        metrics.reset()
     for batch_idx, batch_data in tqdm(
             iterable=enumerate(loader),
             desc=f"{config.dataset} Val [{epoch}/{config.n_epochs}]",
@@ -148,7 +148,7 @@ def evaluation(epoch, loader, config):
                     data)
                 loss = 0
                 if config.print_metrics:
-                    metrics = get_binary_metrics()
+                    metrics.update(output, label.int())
             if parse_config.arch == 'transfuse':
                 loss = loss_fuse
 
@@ -267,10 +267,12 @@ if __name__ == '__main__':
     min_loss = 10
     min_epoch = 0
 
+    metrics = get_binary_metrics()
+
     for epoch in range(1, EPOCHS + 1):
         start = time.time()
-        train(epoch, train_loader, parse_config)
-        dice, iou, loss = evaluation(epoch, val_loader, parse_config)
+        train(epoch, train_loader, parse_config, metrics)
+        dice, iou, loss = evaluation(epoch, val_loader, parse_config, metrics)
         scheduler.step()
 
         if loss < min_loss:
