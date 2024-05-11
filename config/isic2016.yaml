@@ -24,7 +24,7 @@ save_latest: True
 
 pretrained_model_path: /autodl-fs/data/pretrained_model/pvt_v2_b2.pth
 log_file_path: ./log
-trained_model_path: /autodl-fs/data/xboundformer/trained_model/
+trained_model_path: ./trained_model/
 dataset_path: /autodl-fs/data/data_isic161718/isic2016/
-result_path: /autodl-fs/data/xboundformer/result/
+result_path: ./result/
 gt_format: '{}_Segmentation.png'
