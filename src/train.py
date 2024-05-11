@@ -288,5 +288,6 @@ if __name__ == '__main__':
             if epoch - best_ep >= parse_config.patience:
                 print('Early stopping!')
                 break
-        torch.save(model.state_dict(), latest_path)
+        if parse_config.save_latest:
+            torch.save(model.state_dict(), latest_path)
         time_elapsed = time.time() - start
