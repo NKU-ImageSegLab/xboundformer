@@ -22,9 +22,9 @@ image_size: 256
 print_metrics: True
 save_latest: True
 
-pretrained_model_path: pvt_v2_b2.pth
-log_file_path: ./logs/
-trained_model_path: ./trained_models/
-dataset_path: ./data/isic2017/
-result_path: ./results/
+pretrained_model_path: /autodl-fs/data/pretrained_model/pvt_v2_b2.pth
+log_file_path: ./log
+trained_model_path: /autodl-fs/data/xboundformer/trained_model/
+dataset_path: /autodl-fs/data/data_isic161718/isic2017/
+result_path: /autodl-fs/data/xboundformer/result/
 gt_format: '{}_segmentation.png'
