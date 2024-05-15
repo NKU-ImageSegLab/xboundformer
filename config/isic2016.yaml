@@ -11,8 +11,8 @@ seg_loss: 1
 aug: 1
 patience: 500
 filter: 0
-im_num: 1
-ex_num: 1
+im_num: 2
+ex_num: 2
 xbound: 1
 point_w: 1.0
 folder_name: Default_folder
