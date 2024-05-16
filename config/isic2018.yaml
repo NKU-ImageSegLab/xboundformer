@@ -25,6 +25,6 @@ save_latest: True
 pretrained_model_path: pvt_v2_b2.pth
 log_file_path: ./logs/
 trained_model_path: ./trained_models/
-dataset_path: ./data/isic2018/
+dataset_path: /home/chouheiwa/machine_learning/dataset/ISIC/isic2016s
 result_path: ./results/
 gt_format: '{}.png'
