@@ -58,7 +58,7 @@ def get_cfg():
     # log_dir name
     parser.add_argument('--folder_name', type=str)
 
-    parser.add_argument('--print_metrics', type=bool, default=False)
+    parser.add_argument('--print_metrics', type=bool)
 
     parse_config = parser.parse_args()
     with open(parse_config.config, "r") as yaml_file:
