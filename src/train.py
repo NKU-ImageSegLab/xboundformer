@@ -3,7 +3,6 @@ import sys
 from os.path import join
 
 import numpy as np
-import torchmetrics
 from torch.utils.data import DataLoader
 from tqdm import tqdm
 
@@ -12,8 +11,6 @@ from base import get_cfg
 from lib.metrics import get_binary_metrics, MetricsResult, get_binary_simple_metric
 import torch.nn.functional as F
 import torch.utils.data
-
-from medpy.metric.binary import dc, jc
 
 from torch.utils.tensorboard import SummaryWriter
 
