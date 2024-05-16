@@ -3,12 +3,13 @@ import sys
 from os.path import join
 
 import numpy as np
+import torchmetrics
 from torch.utils.data import DataLoader
 from tqdm import tqdm
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 from base import get_cfg
-from lib.metrics import get_binary_metrics, MetricsResult
+from lib.metrics import get_binary_metrics, MetricsResult, get_binary_simple_metric
 import torch.nn.functional as F
 import torch.utils.data
 
@@ -43,7 +44,7 @@ def structure_loss(pred, mask):
 # -------------------------- train func --------------------------#
 def train(epoch, train_loader, config, metrics):
     model.train()
-    if config.print_metrics:
+    if metrics is not None:
         metrics.reset()
     losses = []
     for batch_idx, batch_data in tqdm(
@@ -117,15 +118,14 @@ def train(epoch, train_loader, config, metrics):
 
 
 # -------------------------- eval func --------------------------#
-def evaluation(epoch, loader, config, metrics):
+def evaluation(epoch, loader, config, val_metrics):
     model.eval()
     dice_value = 0
     iou_value = 0
     dice_average = 0
     iou_average = 0
     numm = 0
-    if config.print_metrics:
-        metrics.reset()
+    val_metrics.reset()
     for batch_idx, batch_data in tqdm(
             iterable=enumerate(loader),
             desc=f"{config.dataset} Val [{epoch}/{config.n_epochs}]",
@@ -133,6 +133,7 @@ def evaluation(epoch, loader, config, metrics):
     ):
         data = batch_data['image'].cuda().float()
         label = batch_data['label'].cuda().float()
+        label_int = label.int()
         point = (batch_data['point'] > 0).cuda().float()
         # point_All = (batch_data['point_data'] > 0).cuda().float()
         # point_All = nn.functional.max_pool2d(point_All,
@@ -143,27 +144,20 @@ def evaluation(epoch, loader, config, metrics):
             if parse_config.arch == 'transfuse':
                 _, _, output = model(data)
                 loss_fuse = structure_loss(output, label)
+
             elif parse_config.arch == 'xboundformer':
                 output, point_maps_pre, point_maps_pre1, point_maps_pre2 = model(
                     data)
                 loss = 0
-                if config.print_metrics:
-                    metrics.update(output, label.int())
+
             if parse_config.arch == 'transfuse':
                 loss = loss_fuse
 
-            output = output.cpu().numpy() > 0.5
-
-        label = label.cpu().numpy()
-        assert (output.shape == label.shape)
-        dice_ave = dc(output, label)
-        iou_ave = jc(output, label)
-        dice_value += dice_ave
-        iou_value += iou_ave
-        numm += 1
-
-    dice_average = dice_value / numm
-    iou_average = iou_value / numm
+        output = (output > 0.5).float()
+        val_metrics.update(output, label_int)
+    base_result = val_metrics.compute()
+    dice_average = base_result[f"metrics/Dice"].item()
+    iou_average = base_result[f"metrics/BinaryJaccardIndex"].item()
     # writer.add_scalar('val_metrics/val_dice', dice_average, epoch)
     # writer.add_scalar('val_metrics/val_iou', iou_average, epoch)
     # print("Average dice value of evaluation dataset = ", dice_average)
@@ -228,7 +222,7 @@ if __name__ == '__main__':
     )
     val_loader = DataLoader(
         dataset2,
-        batch_size=1,  # parse_config.bt_size
+        batch_size=parse_config.bt_size,  # parse_config.bt_size
         shuffle=False,  # True
         num_workers=2,
         pin_memory=True,
@@ -267,12 +261,18 @@ if __name__ == '__main__':
     min_loss = 10
     min_epoch = 0
 
-    metrics = get_binary_metrics()
+    metrics = None
 
+    if parse_config.print_metrics:
+        metrics = get_binary_metrics()
+        val_metrics = metrics
+    else:
+        val_metrics = get_binary_simple_metric()
     for epoch in range(1, EPOCHS + 1):
         start = time.time()
         train(epoch, train_loader, parse_config, metrics)
-        dice, iou, loss = evaluation(epoch, val_loader, parse_config, metrics)
+
+        dice, iou, loss = evaluation(epoch, val_loader, parse_config, val_metrics=val_metrics)
         scheduler.step()
 
         if loss < min_loss:

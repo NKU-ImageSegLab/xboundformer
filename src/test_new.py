@@ -52,9 +52,10 @@ def test(model, loader, config):
             elif config.arch == 'xboundformer':
                 output, point_maps_pre, point_maps_pre1, point_maps_pre2 = model(
                     data)
-                metrics.update(output, label.int())
 
-            output = output.cpu() > 0.5
+            output = (output > 0.5).float()
+            metrics.update(output, label)
+            output = output.cpu()
             output = output * 255
         total_length = len(origin_image_names)
         for i in range(total_length):
@@ -84,19 +85,13 @@ if __name__ == '__main__':
     # -------------------------- build dataloaders --------------------------#
     if 'isic' in parse_config.dataset:
         from public.isic_dataset import ISICDataset
-
-        dataset = ISICDataset(
-            parse_config,
-            train=True,
-            aug=parse_config.aug
-        )
-        dataset2 = ISICDataset(
+        val_dataset = ISICDataset(
             parse_config, train=False, aug=False
         )
     else:
         raise NotImplementedError
     val_loader = DataLoader(
-        dataset2,
+        val_dataset,
         batch_size=1,
         shuffle=False,
         num_workers=2,

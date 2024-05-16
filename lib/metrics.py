@@ -122,3 +122,13 @@ def get_binary_metrics(*args, **kwargs):
     # test_metrics
     test_metrics = metrics.clone(prefix="").to(device)
     return test_metrics
+
+def get_binary_simple_metric():
+    metrics = torchmetrics.MetricCollection(
+        [
+            torchmetrics.Dice(multiclass=False),
+            torchmetrics.JaccardIndex(task="binary", num_labels=2, num_classes=2),
+        ],
+        prefix="metrics/",
+    ).cuda()
+    return metrics
