@@ -54,7 +54,7 @@ def test(model, loader, config):
                     data)
 
             output = (output > 0.5).float()
-            metrics.update(output, label)
+            metrics.update(output, label.int())
             output = output.cpu()
             output = output * 255
         total_length = len(origin_image_names)
